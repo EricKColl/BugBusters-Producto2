@@ -4,19 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
  * Clase Datos
  *
- * Esta clase será la encargada de almacenar los datos principales
- * de la aplicación.
- *
- * En este trabajo grupal, esta clase irá creciendo con las aportaciones
- * de los distintos miembros del equipo.
- *
- * =========================================================
  * BLOQUE IMPLEMENTADO POR: Erick Coll Rodríguez
- * PARTE DESARROLLADA: Gestión de artículos
+ * PARTE DESARROLLADA: Gestión de artículos y pedidos
  * =========================================================
  *
  * En esta primera versión se implementa:
@@ -33,12 +27,12 @@ import java.util.Map;
  * En el caso de artículos:
  * - clave  -> código del artículo
  * - valor  -> objeto Articulo
- */
+ * Colecciones implementadas:
+ * - artículos
+ * - pedidos
+      ========================================================= */
 public class Datos {
 
-    /* =========================================================
-       ================== COLECCIÓN DE ARTÍCULOS ===============
-       ========================================================= */
 
     /*
      * BLOQUE DE ERICK COLL RODRÍGUEZ
@@ -48,8 +42,23 @@ public class Datos {
      * La clave será el código del artículo en minúsculas,
      * para evitar problemas si un usuario introduce el código
      * con mayúsculas o minúsculas diferentes.
+     * para evitar problemas de mayúsculas/minúsculas.
      */
     private Map<String, Articulo> articulos;
+
+    /* =========================================================
+       =================== COLECCIÓN DE PEDIDOS ===============
+       ========================================================= */
+
+    /*
+     * Lista de todos los pedidos realizados.
+     */
+    private List<Pedido> listaPedidos;
+
+    /*
+     * Último número de pedido generado
+     */
+    private int ultimoNumeroPedido;
 
     /*
      * Constructor
@@ -59,9 +68,12 @@ public class Datos {
      * Más adelante, cuando otros compañeros añadan su parte,
      * aquí también se inicializarán las colecciones de clientes
      * y pedidos.
+     * Inicializa las colecciones vacías.
      */
     public Datos() {
         articulos = new LinkedHashMap<>();
+        listaPedidos = new ArrayList<>();
+        ultimoNumeroPedido = 0;
     }
 
     /* =========================================================
@@ -141,5 +153,59 @@ public class Datos {
      */
     public List<Articulo> obtenerTodosArticulos() {
         return new ArrayList<>(articulos.values());
+    }
+
+    /* =========================================================
+       ================= GESTIÓN DE PEDIDOS ===================
+       ========================================================= */
+
+    /*
+     * Genera un número de pedido único incremental
+     */
+    public int generarNumeroPedido() {
+        ultimoNumeroPedido++;
+        return ultimoNumeroPedido;
+    }
+
+    /*
+     * Añade un pedido a la lista de pedidos.
+     */
+    public void anadirPedido(Pedido pedido) {
+        listaPedidos.add(pedido);
+    }
+
+    /*
+     * Elimina un pedido de la lista
+     */
+    public void eliminarPedido(Pedido pedido) {
+        listaPedidos.remove(pedido);
+    }
+
+    /*
+     * Busca un pedido por número
+     */
+    public Pedido buscarPedido(int numeroPedido) {
+        for (Pedido p : listaPedidos) {
+            if (p.getNumeroPedido() == numeroPedido) return p;
+        }
+        return null;
+    }
+
+    /*
+     * Devuelve la lista de pedidos pendientes (no enviados)
+     */
+    public List<Pedido> getPedidosPendientes() {
+        return listaPedidos.stream()
+                .filter(Pedido::puedeCancelar)
+                .collect(Collectors.toList());
+    }
+
+    /*
+     * Devuelve la lista de pedidos enviados
+     */
+    public List<Pedido> getPedidosEnviados() {
+        return listaPedidos.stream()
+                .filter(p -> !p.puedeCancelar())
+                .collect(Collectors.toList());
     }
 }
