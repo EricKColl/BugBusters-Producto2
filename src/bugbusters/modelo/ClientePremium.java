@@ -9,18 +9,14 @@ debermos editar el valor de aquí.
  */
     private static final double CUOTA = 30.0;
     private static final double DESCUENTO = 0.20;
-    public ClientePremium (String email, String nombre, String domicilio, String nif, double gastosEnvio) {
-        super(email, nombre, domicilio, nif, gastosEnvio);
+    public ClientePremium (String email, String nombre, String domicilio, String nif) {
+        super(email, nombre, domicilio, nif);
     }
     public double getCuota() {
         return CUOTA;
     }
     public double getDescuento() {
         return DESCUENTO;
-    }
-    public double calcularGastosEnvio() {
-        // Para el cliente Premium aplicamos el descuento asignado a estos.
-        return getGastosEnvio() * (1 - DESCUENTO);
     }
 
     @Override
@@ -32,7 +28,6 @@ debermos editar el valor de aquí.
                 ", NIF=" + getNif() +
                 ", Cuota=" + getCuota() +
                 ", Descuento=" + getDescuento() +
-                ", Gastos de envío=" + getGastosEnvio() +
                 '}';
     }
 

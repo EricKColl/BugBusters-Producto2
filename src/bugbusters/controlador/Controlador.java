@@ -1,7 +1,6 @@
 package bugbusters.controlador;
 
-import bugbusters.modelo.Articulo;
-import bugbusters.modelo.Datos;
+import bugbusters.modelo.*;
 
 import java.util.List;
 
@@ -104,5 +103,67 @@ public class Controlador {
      */
     public List<Articulo> obtenerTodosArticulos() {
         return datos.obtenerTodosArticulos();
+    }
+
+    // ==========================================
+    //       GESTIÓN DE CLIENTES
+    // ==========================================
+
+    /**
+     * añadirCliente()
+     * Crea el objeto específico según el tipo y lo guarda en el modelo.
+     */
+    public boolean añadirCliente(String nombre, String domicilio, String nif, String email, int tipoCliente) {
+        Cliente nuevoCliente;
+
+        // Aquí es donde decidimos qué "forma" toma el objeto
+        if (tipoCliente == 1) {
+            nuevoCliente = new ClienteEstandar(nombre, domicilio, nif, email);
+        } else if (tipoCliente == 2) {
+            nuevoCliente = new ClientePremium(nombre, domicilio, nif, email);
+        } else
+            return false;
+
+        return datos.añadirCliente(nuevoCliente);
+    }
+
+    /**
+     * eliminarCliente()
+     * Solicita al modelo la eliminar un cliente por email.
+     */
+    public boolean eliminarCliente(String email) {
+        return datos.eliminarCliente(email);
+    }
+
+    /**
+     * buscarCliente()
+     * Devuelve el objeto cliente buscado per email.
+     */
+    public Cliente buscarCliente(String email) {
+        return datos.buscarCliente(email);
+    }
+
+    /**
+     * listarClientes()
+     * Devuelve la lista completa de clientes.
+     */
+    public List<Cliente> obtenerTodosClientes() {
+        return datos.obtenerTodosClientes();
+    }
+
+    /**
+     * listarClientesEstandar()
+     * Filtra a través del modelo los clientes estándar.
+     */
+    public List<Cliente> obtenerClientesEstandar() {
+        return datos.obtenerClientesEstandar();
+    }
+
+    /**
+     * listarClientesPremium()
+     * Filtra a través del modelo los clientes premium.
+     */
+    public List<Cliente> obtenerClientesPremium() {
+        return datos.obtenerClientesPremium();
     }
 }

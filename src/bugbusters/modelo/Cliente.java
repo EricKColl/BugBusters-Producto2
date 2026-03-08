@@ -5,18 +5,12 @@ public abstract class Cliente {
     private String nombre;
     private String domicilio;
     private String nif;
-/*
-Deberíamos añadir como atributo gastos de envío, quien crea al cliente en la app le asigna un coste de envío.
-Esto permite que en Estandar ya tienen un costa asignado y en PRemium podemos hacer el cálculo automático en base
-al descuento.
- */
-    private double gastosEnvio;
-    public Cliente (String email, String nombre, String domicilio, String nif, double gastosEnvio){
+
+    public Cliente (String email, String nombre, String domicilio, String nif){
         this.email = email;
         this.nombre = nombre;
         this.domicilio = domicilio;
         this.nif = nif;
-        this.gastosEnvio = gastosEnvio;
     }
 
     public String getEmail(){
@@ -49,15 +43,5 @@ al descuento.
 
     public void setNif(String nif) {
         this.nif = nif;
-    }
-
-    public double getGastosEnvio() {
-        return gastosEnvio;
-    }
-    //Creamos un método polimórfico para dividir comportamientos entre clases hijas.
-    public abstract double calcularGastosEnvio();
-
-    public void setGastosEnvio(double gastosEnvio) {
-        this.gastosEnvio = gastosEnvio;
     }
 }

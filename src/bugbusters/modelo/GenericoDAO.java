@@ -9,9 +9,9 @@ import java.util.Map;
  */
 public class GenericoDAO<K, T> {
 
-    /*
-    Usamos protected para que las clases hijas (como ClienteDAO)
-    puedan acceder directamente a 'datos' si necesitan hacer filtros.
+    /**
+     *    Usamos protected para que las clases hijas (como ClienteDAO)
+     *     puedan acceder directamente a 'datos' si necesitan hacer filtros.
     */
     protected Map<K, T> datos;
 
