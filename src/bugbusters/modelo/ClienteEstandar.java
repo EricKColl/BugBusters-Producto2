@@ -6,12 +6,24 @@ public class ClienteEstandar extends Cliente{
     }
 
     @Override
+    public double calcularCuota() {
+        return 0.0;
+    }
+
+    @Override
+    public double descuentoEnvio() {
+        return 0.0;
+    }
+
+    @Override
     public String toString() {
         return "ClienteEstandar{"+
                 "Email='" + getEmail() + '\'' +
                 ", Nombre='" + getNombre() + '\'' +
                 ", Domicilio=" + getDomicilio() +
                 ", NIF=" + getNif() +
+                ", Cuota=" + calcularCuota() +
+                ", Descuento=" + descuentoEnvio() +
                 '}';
     }
 

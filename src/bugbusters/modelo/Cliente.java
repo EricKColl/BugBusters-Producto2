@@ -44,4 +44,7 @@ public abstract class Cliente {
     public void setNif(String nif) {
         this.nif = nif;
     }
+
+    public abstract double calcularCuota();
+    public abstract double descuentoEnvio();
 }

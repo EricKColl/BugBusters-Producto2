@@ -2,7 +2,6 @@ package bugbusters.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /*
  * Clase Datos
@@ -102,7 +101,7 @@ public class Datos {
      * se podrá ampliar fácilmente con validaciones o excepciones.
      */
     public void anadirArticulo(Articulo articulo) {
-        articulos.añadir(articulo.getCodigo().toLowerCase(), articulo);
+        articulos.anadir(articulo.getCodigo().toLowerCase(), articulo);
     }
 
     /*
@@ -162,14 +161,14 @@ public class Datos {
     /**
      * Añadir con validación de clave única (email).
      */
-    public boolean añadirCliente(Cliente cliente) {
+    public boolean anadirCliente(Cliente cliente) {
         String email = cliente.getEmail();
 
         if (clientes.existe(email)) {
             return false; // El email ya existe, no se añade.
         }
 
-        clientes.añadir(email, cliente);
+        clientes.anadir(email, cliente);
         return true;
     }
 

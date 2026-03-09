@@ -51,11 +51,11 @@ public class Vista {
 
             switch (opcion) {
                 case 1:
-                    menuArticulos(); // ✅ TU PARTE
+                    menuArticulos();
                     break;
 
                 case 2:
-                    System.out.println("Gestión de clientes (pendiente de implementar).");
+                    menuClientes();
                     break;
 
                 case 3:
@@ -176,7 +176,7 @@ public class Vista {
 
             switch (opcion) {
                 case 1:
-                    añadirCliente();
+                    anadirCliente();
                     break;
                 case 2:
                     buscarCliente();
@@ -206,7 +206,7 @@ public class Vista {
      * anadirArticulo()
      * Pide datos por teclado, crea el artículo desde el controlador y lo guarda.
      */
-    private void añadirCliente() {
+    private void anadirCliente() {
         System.out.println("\nAñadir Cliente");
 
         String email = leerTexto("Email: ");
@@ -216,7 +216,7 @@ public class Vista {
         int tipoCliente = leerEntero("Tipo de cliente (1- Estándar, 2- Premium): ");
 
         // Llamamos al controlador y guardamos el resultado
-        boolean resultado = controlador.añadirCliente(email, nombre, domicilio, nif, tipoCliente);
+        boolean resultado = controlador.anadirCliente(email, nombre, domicilio, nif, tipoCliente);
 
         // Mostramos el mensaje adecuado según lo que pasó en el Controlador/Modelo
         if (resultado) {

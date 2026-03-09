@@ -19,7 +19,7 @@ public class GenericoDAO<K, T> {
         this.datos = new HashMap<>();
     }
 
-    public void añadir(K llave, T objeto) {
+    public void anadir(K llave, T objeto) {
         datos.put(llave, objeto);
     }
 
