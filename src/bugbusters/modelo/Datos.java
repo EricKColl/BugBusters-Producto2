@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 /*
  * Clase Datos
  *
@@ -70,9 +71,11 @@ public class Datos {
      * y pedidos.
      * Inicializa las colecciones vacías.
      */
+    private GenericoDAO<String, Cliente> clientes;
     public Datos() {
         articulos = new LinkedHashMap<>();
         listaPedidos = new ArrayList<>();
+        clientes = new GenericoDAO<>();
         ultimoNumeroPedido = 0;
     }
 
@@ -207,5 +210,75 @@ public class Datos {
         return listaPedidos.stream()
                 .filter(p -> !p.puedeCancelar())
                 .collect(Collectors.toList());
+    }
+
+    // ==========================================
+    //       GESTIÓN DE CLIENTES
+    // ==========================================
+
+    /**
+     * Añadir con validación de clave única (email).
+     */
+    public boolean anadirCliente(Cliente cliente) {
+        String email = cliente.getEmail();
+
+        if (clientes.existe(email)) {
+            return false; // El email ya existe, no se añade.
+        }
+
+        clientes.anadir(email, cliente);
+        return true;
+    }
+
+    /**
+     * Busca un cliente por su email.
+     */
+    public Cliente buscarCliente(String email) {
+        return clientes.buscar(email);
+    }
+
+    /**
+     * Devuelve la lista completa de clientes.
+     */
+    public ArrayList<Cliente> obtenerTodosClientes() {
+        return clientes.obtenerTodos();
+    }
+
+    /**
+     * Filtra y devuelve solo los clientes de tipo Estándar.
+     */
+    public ArrayList<Cliente> obtenerClientesEstandar() {
+        ArrayList<Cliente> listaEstandar = new ArrayList<>();
+        // 'datos' es accesible por ser protected en GenericoDAO
+        for (Cliente c : clientes.obtenerTodos()) {
+            if (c instanceof ClienteEstandar) {
+                listaEstandar.add(c);
+            }
+        }
+        return listaEstandar;
+    }
+
+    /**
+     * Filtra y devuelve solo los clientes de tipo Premium.
+     */
+    public ArrayList<Cliente> obtenerClientesPremium() {
+        ArrayList<Cliente> listaPremium = new ArrayList<>();
+        for (Cliente c : clientes.obtenerTodos()) {
+            if (c instanceof ClientePremium) {
+                listaPremium.add(c);
+            }
+        }
+        return listaPremium;
+    }
+
+    /**
+     * Elimina un cliente por su email.
+     */
+    public boolean eliminarCliente(String email) {
+        if (clientes.existe(email)) {
+            clientes.eliminar(email);
+            return true;
+        }
+        return false;
     }
 }

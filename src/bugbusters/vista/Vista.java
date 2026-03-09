@@ -4,6 +4,7 @@ import bugbusters.controlador.Controlador;
 import bugbusters.modelo.Articulo;
 import bugbusters.modelo.Cliente;
 import bugbusters.modelo.Pedido;
+import bugbusters.modelo.ClientePremium;
 
 import java.util.List;
 import java.util.Scanner;
@@ -305,7 +306,9 @@ public class Vista {
             System.out.println("\n[ERROR] No existe ningún cliente registrado con el email: " + email);
         }
     }
-
+    // ==========================================
+    //       MENÚ DE PEDIDOS
+    // ==========================================
 
     private void menuPedidos() {
         int opcion;
