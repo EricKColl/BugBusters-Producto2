@@ -1,9 +1,7 @@
 package bugbusters.modelo;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /*
  * Clase Datos
@@ -36,6 +34,22 @@ import java.util.Map;
  */
 public class Datos {
 
+    /**
+     * Declaramos los "almacenes" usando la clase GenericoDAO
+     * La clave será el código del artículo en minúsculas,
+     * para evitar problemas si un usuario introduce el código
+     * con mayúsculas o minúsculas diferentes.
+     *
+     */
+    private GenericoDAO<String, Articulo> articulos;
+
+    //"Almacén" Cliente donde la clave es String (Email)
+    private GenericoDAO<String, Cliente> clientes;
+    public Datos() {
+        // Inicializamos los "almacenes"
+        this.clientes = new GenericoDAO<>();
+        this.articulos = new GenericoDAO<>();
+    }
     /* =========================================================
        ================== COLECCIÓN DE ARTÍCULOS ===============
        ========================================================= */
@@ -49,7 +63,7 @@ public class Datos {
      * para evitar problemas si un usuario introduce el código
      * con mayúsculas o minúsculas diferentes.
      */
-    private Map<String, Articulo> articulos;
+
 
     /*
      * Constructor
@@ -60,9 +74,6 @@ public class Datos {
      * aquí también se inicializarán las colecciones de clientes
      * y pedidos.
      */
-    public Datos() {
-        articulos = new LinkedHashMap<>();
-    }
 
     /* =========================================================
        ================= GESTIÓN DE ARTÍCULOS ==================
@@ -90,7 +101,7 @@ public class Datos {
      * se podrá ampliar fácilmente con validaciones o excepciones.
      */
     public void anadirArticulo(Articulo articulo) {
-        articulos.put(articulo.getCodigo().toLowerCase(), articulo);
+        articulos.anadir(articulo.getCodigo().toLowerCase(), articulo);
     }
 
     /*
@@ -109,7 +120,7 @@ public class Datos {
      * sea consistente con la forma en que se guardan los datos.
      */
     public Articulo buscarArticulo(String codigo) {
-        return articulos.get(codigo.toLowerCase());
+        return articulos.buscar(codigo.toLowerCase());
     }
 
     /*
@@ -125,7 +136,7 @@ public class Datos {
      * - false si no existe
      */
     public boolean existeArticulo(String codigo) {
-        return articulos.containsKey(codigo.toLowerCase());
+        return articulos.existe(codigo.toLowerCase());
     }
 
     /*
@@ -140,6 +151,76 @@ public class Datos {
      * para no exponer directamente la estructura interna.
      */
     public List<Articulo> obtenerTodosArticulos() {
-        return new ArrayList<>(articulos.values());
+        return articulos.obtenerTodos();
+    }
+
+    // ==========================================
+    //       GESTIÓN DE CLIENTES
+    // ==========================================
+
+    /**
+     * Añadir con validación de clave única (email).
+     */
+    public boolean anadirCliente(Cliente cliente) {
+        String email = cliente.getEmail();
+
+        if (clientes.existe(email)) {
+            return false; // El email ya existe, no se añade.
+        }
+
+        clientes.anadir(email, cliente);
+        return true;
+    }
+
+    /**
+     * Busca un cliente por su email.
+     */
+    public Cliente buscarCliente(String email) {
+        return clientes.buscar(email);
+    }
+
+    /**
+     * Devuelve la lista completa de clientes.
+     */
+    public ArrayList<Cliente> obtenerTodosClientes() {
+        return clientes.obtenerTodos();
+    }
+
+    /**
+     * Filtra y devuelve solo los clientes de tipo Estándar.
+     */
+    public ArrayList<Cliente> obtenerClientesEstandar() {
+        ArrayList<Cliente> listaEstandar = new ArrayList<>();
+        // 'datos' es accesible por ser protected en GenericoDAO
+        for (Cliente c : clientes.obtenerTodos()) {
+            if (c instanceof ClienteEstandar) {
+                listaEstandar.add(c);
+            }
+        }
+        return listaEstandar;
+    }
+
+    /**
+     * Filtra y devuelve solo los clientes de tipo Premium.
+     */
+    public ArrayList<Cliente> obtenerClientesPremium() {
+        ArrayList<Cliente> listaPremium = new ArrayList<>();
+        for (Cliente c : clientes.obtenerTodos()) {
+            if (c instanceof ClientePremium) {
+                listaPremium.add(c);
+            }
+        }
+        return listaPremium;
+    }
+
+    /**
+     * Elimina un cliente por su email.
+     */
+    public boolean eliminarCliente(String email) {
+        if (clientes.existe(email)) {
+            clientes.eliminar(email);
+            return true;
+        }
+        return false;
     }
 }

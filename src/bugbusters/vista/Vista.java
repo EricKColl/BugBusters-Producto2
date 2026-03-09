@@ -2,6 +2,7 @@ package bugbusters.vista;
 
 import bugbusters.controlador.Controlador;
 import bugbusters.modelo.Articulo;
+import bugbusters.modelo.Cliente;
 
 import java.util.List;
 import java.util.Scanner;
@@ -50,11 +51,11 @@ public class Vista {
 
             switch (opcion) {
                 case 1:
-                    menuArticulos(); // ✅ TU PARTE
+                    menuArticulos();
                     break;
 
                 case 2:
-                    System.out.println("Gestión de clientes (pendiente de implementar).");
+                    menuClientes();
                     break;
 
                 case 3:
@@ -155,6 +156,155 @@ public class Vista {
             }
         }
     }
+    // ==========================================
+    //       MENÚ DE CLIENTES
+    // ==========================================
+
+    private void menuClientes() {
+        int opcion;
+
+        do {
+            System.out.println("\n--- GESTIÓN DE CLIENTES ---");
+            System.out.println("1. Añadir cliente");
+            System.out.println("2. Buscar cliente");
+            System.out.println("3. Mostrar todos los clientes");
+            System.out.println("4. Mostrar clientes estandar");
+            System.out.println("5. Mostrar clientes premium");
+            System.out.println("6. Eliminar cliente");
+            System.out.println("0. Volver");
+            opcion = leerEntero("Selecciona una opción: ");
+
+            switch (opcion) {
+                case 1:
+                    anadirCliente();
+                    break;
+                case 2:
+                    buscarCliente();
+                    break;
+                case 3:
+                    obtenerTodosClientes();
+                    break;
+                case 4:
+                    obtenerClientesEstandar();
+                    break;
+                case 5:
+                    obtenerClientesPremium();
+                    break;
+                case 6:
+                    eliminarCliente();
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opción no válida.");
+            }
+
+        } while (opcion != 0);
+    }
+
+    /*
+     * anadirArticulo()
+     * Pide datos por teclado, crea el artículo desde el controlador y lo guarda.
+     */
+    private void anadirCliente() {
+        System.out.println("\nAñadir Cliente");
+
+        String email = leerTexto("Email: ");
+        String nombre = leerTexto("Nombre: ");
+        String domicilio = leerTexto("Domicilio: ");
+        String nif = leerTexto("NIF: ");
+        int tipoCliente = leerEntero("Tipo de cliente (1- Estándar, 2- Premium): ");
+
+        // Llamamos al controlador y guardamos el resultado
+        boolean resultado = controlador.anadirCliente(email, nombre, domicilio, nif, tipoCliente);
+
+        // Mostramos el mensaje adecuado según lo que pasó en el Controlador/Modelo
+        if (resultado) {
+            System.out.println("\n[OK] Cliente añadido correctamente.");
+        } else {
+            System.out.println("\n[ERROR] No se pudo añadir el cliente.");
+            System.out.println("Causa posible: Tipo de cliente no válido o el Email ya está registrado.");
+        }
+    }
+
+    private void buscarCliente(){
+        String email = leerTexto("Introduce el Email del cliente: ");
+
+        // Llamamos al controlador, que nos devuelve el objeto Cliente o null
+        Cliente clienteEncontrado = controlador.buscarCliente(email);
+
+        if (clienteEncontrado != null) {
+            System.out.println("\n[Datos del Cliente]");
+            // Al imprimir el objeto, Java llama automáticamente al toString()
+            System.out.println(clienteEncontrado);
+        } else {
+            System.out.println("\n[ERROR] No existe ningún cliente registrado con el email: " + email);
+        }
+
+    }
+
+    private void obtenerTodosClientes(){
+        System.out.println("\nListado de Clientes:");
+
+        List<Cliente> clientes = controlador.obtenerTodosClientes();
+
+        if (clientes.isEmpty()) {
+            System.out.println("No hay clientes registrados.");
+        } else {
+            for (Cliente c : clientes) {
+                System.out.println(c);
+            }
+        }
+    }
+
+    private void obtenerClientesEstandar(){
+        System.out.println("\nListado de Clientes Estándar:");
+
+        List<Cliente> clientes = controlador.obtenerClientesEstandar();
+
+        if (clientes.isEmpty()) {
+            System.out.println("No hay clientes estándar registrados.");
+        } else {
+            for (Cliente c : clientes) {
+                System.out.println(c);
+            }
+        }
+
+    }
+
+    private void obtenerClientesPremium(){
+        System.out.println("\nListado de Clientes Premium:");
+        List<Cliente> clientes = controlador.obtenerClientesPremium();
+
+        if (clientes.isEmpty()) {
+            System.out.println("No hay clientes premium registrados.");
+        } else {
+            for (Cliente c : clientes) {
+                System.out.println(c);
+            }
+        }
+    }
+
+    private void eliminarCliente(){
+        System.out.println("\nEiminar Cliente");
+        String email = leerTexto("Introduce el Email del cliente: ");
+
+        // Buscamos si existe para tener sus datos
+        Cliente aEliminar = controlador.buscarCliente(email);
+
+        if (aEliminar != null) {
+            // Si existe, lo borramos
+            boolean eliminado = controlador.eliminarCliente(email);
+
+            if (eliminado) {
+                System.out.println("\n[OK] Cliente eliminado con éxito:");
+                System.out.println(aEliminar);
+            }
+        } else {
+            System.out.println("\n[ERROR] No existe ningún cliente registrado con el email: " + email);
+        }
+    }
+
 
     /* =========================================================
        ================== MÉTODOS AUXILIARES ===================
