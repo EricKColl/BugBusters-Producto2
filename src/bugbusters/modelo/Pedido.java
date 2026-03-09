@@ -48,13 +48,13 @@ public class Pedido {
     public double calcularTotal() {
         double precioBase = articulo.getPrecioVenta() * cantidad;
         double envio = articulo.getGastosEnvio();
-        double total = precioBase + envio;
 
-        // Si el cliente es premium, aplica descuento del 20%
+        // Aplicar descuento solo al envío si el cliente es premium
         if (cliente.esPremium()) {
-            total *= 0.8;
+            envio = envio * (1 - cliente.descuentoEnvio()); // descuentoEnvio() devuelve 0.2 para premium
         }
-        return total;
+
+        return precioBase + envio;
     }
 
     // Método para comprobar si el pedido se puede cancelar

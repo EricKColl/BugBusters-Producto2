@@ -1,13 +1,16 @@
 package bugbusters.controlador;
 
 import bugbusters.modelo.Articulo;
-import bugbusters.modelo.Datos;
 import bugbusters.modelo.Cliente;
+import bugbusters.modelo.ClienteEstandar;
+import bugbusters.modelo.ClientePremium;
+import bugbusters.modelo.Datos;
 import bugbusters.modelo.Pedido;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 /*
  * Clase Controlador
@@ -115,119 +118,85 @@ public class Controlador {
        ========== BLOQUE PARA NUEVA FUNCIONALIDAD =============
        ========================================================= */
 
-    /*
-     * anadirPedido()
-     *
-     * Añade un pedido a la lista de pedidos.
-     * Si el cliente no existe, lo crea y lo añade a la lista de clientes.
-     * El artículo debe existir previamente.
-     *
-     * Parámetros:
-     * - nombreCliente, emailCliente, esPremium -> datos del cliente
-     * - codigoArticulo -> artículo a comprar
-     * - cantidad -> número de unidades
+    /**
+     * Añade un pedido.
+     * Devuelve el pedido creado si se añadió correctamente,
+     * o null si no se pudo crear (por ejemplo, artículo inexistente).
      */
-    public void anadirPedido(String nombreCliente, String emailCliente, boolean esPremium,
-                             String codigoArticulo, int cantidad) {
+    public Pedido anadirPedido(String emailCliente, String nombreCliente, boolean esPremium,
+                               String codigoArticulo, int cantidad, String domicilio, String nif) {
 
-        // Buscar cliente en datos
-        Cliente cliente = datos.buscarCliente(nombreCliente);
+        // Buscar cliente
+        Cliente cliente = datos.buscarCliente(emailCliente);
 
-        // Si el cliente no existe, crearlo y añadirlo
-        if(cliente == null) {
-            cliente = new Cliente(nombreCliente, emailCliente, esPremium);
+        // Crear cliente si no existe
+        if (cliente == null) {
+            if (esPremium) {
+                cliente = new ClientePremium(emailCliente, nombreCliente, domicilio, nif);
+            } else {
+                cliente = new ClienteEstandar(emailCliente, nombreCliente, domicilio, nif);
+            }
             datos.anadirCliente(cliente);
         }
 
         // Buscar artículo
         Articulo articulo = datos.buscarArticulo(codigoArticulo);
-        if(articulo == null) {
-            System.out.println("El artículo no existe. No se puede crear el pedido.");
-            return;
+        if (articulo == null) {
+            return null; // artículo inexistente
         }
 
-        // Crear el pedido
-        int numeroPedido = datos.generarNumeroPedido(); // método que genera IDs únicos
+        // Crear pedido
+        int numeroPedido = datos.generarNumeroPedido();
         Pedido pedido = new Pedido(numeroPedido, cliente, articulo, cantidad, LocalDateTime.now());
 
-        // Añadir pedido a la lista de pedidos
+        // Añadir pedido
         datos.anadirPedido(pedido);
 
-        System.out.println("Pedido añadido correctamente: " + pedido);
+        return pedido;
     }
 
-    /*
-     * eliminarPedido()
-     *
-     * Elimina un pedido únicamente si no ha sido enviado.
-     * Un pedido se considera enviado si ha pasado el tiempo de preparación del artículo.
-     *
-     * Parámetros:
-     * - numeroPedido -> identificador del pedido
+    /**
+     * Elimina un pedido.
+     * Devuelve:
+     * - true si se eliminó correctamente
+     * - false si no existe o no se puede eliminar
      */
-    public void eliminarPedido(int numeroPedido) {
+    public boolean eliminarPedido(int numeroPedido) {
         Pedido pedido = datos.buscarPedido(numeroPedido);
+        if (pedido == null) return false;
+        if (!pedido.puedeCancelar()) return false;
 
-        if(pedido == null) {
-            System.out.println("No existe un pedido con ese número.");
-            return;
-        }
-
-        if(pedido.puedeCancelar()) {
-            datos.eliminarPedido(pedido);
-            System.out.println("Pedido eliminado correctamente.");
-        } else {
-            System.out.println("No se puede eliminar el pedido porque ya ha sido enviado.");
-        }
+        datos.eliminarPedido(pedido);
+        return true;
     }
 
-    /*
-     * mostrarPedidosPendientes()
-     *
-     * Muestra los pedidos que todavía no han sido enviados.
-     * Se puede filtrar opcionalmente por nombre de cliente.
-     *
-     * Parámetros:
-     * - nombreCliente -> si es null o vacío, muestra todos
+    /**
+     * Obtiene los pedidos pendientes.
+     * Si emailCliente no es null ni vacío, filtra por email.
      */
-    public void mostrarPedidosPendientes(String nombreCliente) {
+    public List<Pedido> obtenerPedidosPendientes(String emailCliente) {
         List<Pedido> pedidos = datos.getPedidosPendientes();
 
-        if(nombreCliente != null && !nombreCliente.isEmpty()) {
+        if (emailCliente != null && !emailCliente.isEmpty()) {
             pedidos = pedidos.stream()
-                    .filter(p -> p.getCliente().getNombre().equalsIgnoreCase(nombreCliente))
+                    .filter(p -> p.getCliente().getEmail().equalsIgnoreCase(emailCliente))
                     .collect(Collectors.toList());
         }
-
-        if(pedidos.isEmpty()) {
-            System.out.println("No hay pedidos pendientes que mostrar.");
-        } else {
-            pedidos.forEach(System.out::println);
-        }
+        return pedidos;
     }
 
-    /*
-     * mostrarPedidosEnviados()
-     *
-     * Muestra los pedidos que ya han sido enviados.
-     * Se puede filtrar opcionalmente por nombre de cliente.
-     *
-     * Parámetros:
-     * - nombreCliente -> si es null o vacío, muestra todos
+    /**
+     * Obtiene los pedidos enviados.
+     * Si emailCliente no es null ni vacío, filtra por email.
      */
-    public void mostrarPedidosEnviados(String nombreCliente) {
+    public List<Pedido> obtenerPedidosEnviados(String emailCliente) {
         List<Pedido> pedidos = datos.getPedidosEnviados();
 
-        if(nombreCliente != null && !nombreCliente.isEmpty()) {
+        if (emailCliente != null && !emailCliente.isEmpty()) {
             pedidos = pedidos.stream()
-                    .filter(p -> p.getCliente().getNombre().equalsIgnoreCase(nombreCliente))
+                    .filter(p -> p.getCliente().getEmail().equalsIgnoreCase(emailCliente))
                     .collect(Collectors.toList());
         }
-
-        if(pedidos.isEmpty()) {
-            System.out.println("No hay pedidos enviados que mostrar.");
-        } else {
-            pedidos.forEach(System.out::println);
-        }
+        return pedidos;
     }
 }
