@@ -368,9 +368,6 @@ public class Vista {
 
             // Verificamos que el artículo exista
             Articulo articulo = controlador.buscarArticulo(codigoArticulo);
-            if (articulo == null) {
-                throw new RecursoNoEncontradoException("Artículo", codigoArticulo);
-            }
 
             // Pedimos cantidad
             int cantidad = leerEntero("Cantidad: ");

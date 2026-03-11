@@ -88,8 +88,12 @@ public class Controlador {
      * - el objeto Articulo si existe
      * - null si no existe
      */
-    public Articulo buscarArticulo(String codigo) {
-        return datos.buscarArticulo(codigo);
+    public Articulo buscarArticulo(String codigo) throws RecursoNoEncontradoException {
+        Articulo articulo = datos.buscarArticulo(codigo);
+        if (articulo == null) {
+            throw new RecursoNoEncontradoException("Artículo", codigo);
+        }
+        return articulo;
     }
 
     /*
