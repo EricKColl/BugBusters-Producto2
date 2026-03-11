@@ -225,15 +225,17 @@ public class Vista {
         String nif = leerTexto("NIF: ");
         int tipoCliente = leerEntero("Tipo de cliente (1- Estándar, 2- Premium): ");
 
-        // Llamamos al controlador y guardamos el resultado
-        boolean resultado = controlador.anadirCliente(email, nombre, domicilio, nif, tipoCliente);
+        try {
+            boolean resultado = controlador.anadirCliente(email, nombre, domicilio, nif, tipoCliente);
 
-        // Mostramos el mensaje adecuado según lo que pasó en el Controlador/Modelo
-        if (resultado) {
-            System.out.println("\n[INFO] Cliente añadido correctamente.");
-        } else {
-            System.out.println("\n[ERROR] No se pudo añadir el cliente.");
-            System.out.println("Causa posible: Tipo de cliente no válido o el Email ya está registrado.");
+            if (resultado) {
+                System.out.println("\n[INFO] Cliente añadido correctamente.");
+            } else {
+                System.out.println("\n[ERROR] No se pudo añadir el cliente. El email ya existe.");
+            }
+
+        } catch (TipoClienteInvalidoException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -345,9 +347,15 @@ public class Vista {
             String nif = leerTexto("NIF: ");
             int tipo = leerEntero("Tipo cliente (1-Estándar, 2-Premium): ");
 
-            boolean creado = controlador.anadirCliente(emailCliente, nombre, domicilio, nif, tipo);
-            if (!creado) {
-                System.out.println("[ERROR] No se pudo crear el cliente. Pedido cancelado.");
+            //Crea al cliente
+            try {
+                boolean creado = controlador.anadirCliente(emailCliente, nombre, domicilio, nif, tipo);
+                if (!creado) {
+                    System.out.println("[ERROR] No se pudo crear el cliente. Pedido cancelado.");
+                    return;
+                }
+            } catch (TipoClienteInvalidoException ec) {
+                System.out.println(e.getMessage());
                 return;
             }
 

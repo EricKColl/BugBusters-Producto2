@@ -222,16 +222,17 @@ public class Controlador {
      * añadirCliente()
      * Crea el objeto específico según el tipo y lo guarda en el modelo.
      */
-    public boolean anadirCliente(String email, String nombre, String domicilio, String nif,  int tipoCliente) {
+    public boolean anadirCliente(String email, String nombre, String domicilio, String nif, int tipoCliente)
+            throws TipoClienteInvalidoException {
         Cliente nuevoCliente;
 
-        // Aquí es donde decidimos qué "forma" toma el objeto
         if (tipoCliente == 1) {
             nuevoCliente = new ClienteEstandar(email, nombre, domicilio, nif);
         } else if (tipoCliente == 2) {
             nuevoCliente = new ClientePremium(email, nombre, domicilio, nif);
-        } else
-            return false;
+        } else {
+            throw new TipoClienteInvalidoException(tipoCliente);
+        }
 
         return datos.anadirCliente(nuevoCliente);
     }
