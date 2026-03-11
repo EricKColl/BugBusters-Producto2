@@ -164,13 +164,21 @@ public class Controlador {
      * - true si se eliminó correctamente
      * - false si no existe o no se puede eliminar
      */
-    public boolean eliminarPedido(int numeroPedido) {
+    /**
+     * Elimina un pedido.
+     * Lanza RecursoNoEncontradoException si no existe el pedido.
+     */
+    public void eliminarPedido(int numeroPedido) throws RecursoNoEncontradoException {
         Pedido pedido = datos.buscarPedido(numeroPedido);
-        if (pedido == null) return false;
-        if (!pedido.puedeCancelar()) return false;
+        if (pedido == null) {
+            throw new RecursoNoEncontradoException("Pedido", String.valueOf(numeroPedido));
+        }
+        if (!pedido.puedeCancelar()) {
+            // Si no se puede cancelar, dejamos que siga devolviendo false o podemos crear otra excepción específica
+            throw new IllegalStateException("El pedido no puede ser cancelado porque ya ha sido enviado.");
+        }
 
         datos.eliminarPedido(pedido);
-        return true;
     }
 
     /**

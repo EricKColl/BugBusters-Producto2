@@ -384,11 +384,13 @@ public class Vista {
         System.out.println("\nEliminar pedido");
         int numeroPedido = leerEntero("Número de pedido: ");
 
-        boolean eliminado = controlador.eliminarPedido(numeroPedido);
-        if (eliminado) {
-            System.out.println("\n[INFO] Pedido eliminado correctamente.");
-        } else {
-            System.out.println("[ERROR] No se pudo eliminar el pedido. Puede que ya haya sido enviado o no exista.");
+        try {
+            controlador.eliminarPedido(numeroPedido);
+            System.out.println("\n[OK] Pedido eliminado correctamente.");
+        } catch (RecursoNoEncontradoException e) {
+            System.out.println(e.getMessage());
+        } catch (IllegalStateException e) {
+            System.out.println("[ERROR] " + e.getMessage());
         }
     }
 
