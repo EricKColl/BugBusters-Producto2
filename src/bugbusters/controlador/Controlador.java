@@ -114,8 +114,8 @@ public class Controlador {
      * @throws RecursoNoEncontradoException Si el cliente o el artículo no existen
      */
     public Pedido anadirPedido(String emailCliente, String codigoArticulo, int cantidad)
-            throws RecursoNoEncontradoException {
-
+            throws RecursoNoEncontradoException, EmailInvalidoException {
+        emailValido(emailCliente); // Validar email
         // Buscar cliente
         Cliente cliente = datos.buscarCliente(emailCliente);
         if (cliente == null) { // Lanzamos excepción si el cliente no existe
@@ -217,8 +217,20 @@ public class Controlador {
         if (email == null || !email.matches(regex)) {
             throw new EmailInvalidoException(email); // Lanzamos excepción si el email no es válido
         }
-        return true;
+        return true; // Si es correcto pasa la validación
     }
+
+    /**
+     * Comprueba si existe un cliente lanzando excepción
+     * Útil para la vista cuando quiere saber si puede crear o no
+     */
+    public boolean existeCliente(String email) throws YaExisteException {
+        if (datos.existeCliente(email)) {
+            throw new YaExisteException("cliente", email); // Lanzamos excepción si el email ya existe
+        }
+        return false; // Si es correcto pasa la validación
+    }
+
 
     /**
      * Añade un nuevo cliente al sistema.
@@ -233,15 +245,13 @@ public class Controlador {
      * @throws TipoClienteInvalidoException Si el tipo de cliente no es 1 o 2
      * @throws YaExisteException Si ya existe un cliente con el mismo email
      */
-    public boolean anadirCliente(String email, String nombre, String domicilio, String nif, int tipoCliente)
-            throws TipoClienteInvalidoException, YaExisteException {
+    public Cliente anadirCliente(String email, String nombre, String domicilio, String nif, int tipoCliente)
+            throws TipoClienteInvalidoException, YaExisteException, EmailInvalidoException {
 
-        // 1. Verificar si ya existe
-        if (datos.existeCliente(email)) { // Lanzamos excepción si ya existe
-            throw new YaExisteException("cliente", email);
-        }
+        emailValido(email); // Validar email, puede lanzar EmailInvalidoException
+        existeCliente(email); // Verificar si ya existe, puede lanzar YaExisteException
 
-        // 2. Crear cliente según tipo
+        // 1. Crear cliente según tipo
         Cliente nuevoCliente;
         if (tipoCliente == 1) {
             nuevoCliente = new ClienteEstandar(email, nombre, domicilio, nif);
@@ -252,8 +262,8 @@ public class Controlador {
         }
 
         // 3. Guardar cliente
-        datos.anadirCliente(nuevoCliente); // No lanza excepciones
-        return true;
+        datos.anadirCliente(nuevoCliente);
+        return nuevoCliente;
     }
 
     /**
@@ -261,15 +271,12 @@ public class Controlador {
      *
      * @param email Email del cliente a eliminar
      * @return true si el cliente se eliminó correctamente
+     * @throws EmailInvalidoException Si el email no tiene un formato válido
      * @throws RecursoNoEncontradoException Si no existe un cliente con ese email
      */
-    public boolean eliminarCliente(String email) throws RecursoNoEncontradoException {
-        //Comprobamos que existe
-        Cliente cliente = datos.buscarCliente(email);
-        if (cliente == null) { // Lanzamos excepción si no existe
-            throw new RecursoNoEncontradoException("Cliente", email);
-        }
-        // Si existe lo eliminamos
+    public boolean eliminarCliente(String email) throws RecursoNoEncontradoException, EmailInvalidoException {
+        emailValido(email); // Validar email, puede lanzar EmailInvalidoException
+        Cliente cliente = buscarCliente(email); // Si no existe, lanza excepción
         return datos.eliminarCliente(email);
     }
 
@@ -280,7 +287,12 @@ public class Controlador {
      * @return El objeto Cliente si existe
      * @throws RecursoNoEncontradoException Si no existe un cliente con ese email
      */
-    public Cliente buscarCliente(String email) throws RecursoNoEncontradoException {
+    public Cliente buscarCliente(String email)
+            throws EmailInvalidoException, RecursoNoEncontradoException {
+
+        emailValido(email);  // Lanza exception si es inválido
+
+        // Buscar en datos
         Cliente cliente = datos.buscarCliente(email);
         if (cliente == null) {
             throw new RecursoNoEncontradoException("Cliente", email);

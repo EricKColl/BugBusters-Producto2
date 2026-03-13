@@ -15,6 +15,6 @@ package bugbusters.modelo.excepciones;
 
 public class RecursoNoEncontradoException extends Exception {
     public RecursoNoEncontradoException(String tipo, String identificador) {
-        super(tipo + " no encontrado: " + identificador + ".");
+        super(tipo + " no encontrado.");
     }
 }
