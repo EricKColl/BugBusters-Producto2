@@ -68,7 +68,7 @@ public class Datos {
      * @param articulo El artículo a añadir
      */
     public void anadirArticulo(Articulo articulo) {
-        articulos.anadir(articulo.getCodigo().toLowerCase(), articulo);
+        articulos.anadir(articulo.getCodigo(), articulo);
     }
 
     /**
