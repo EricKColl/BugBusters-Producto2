@@ -88,7 +88,7 @@ public class Controlador {
 
         Articulo articulo = new Articulo(codigo, descripcion, precioVenta,
                 gastosEnvio, tiempoPreparacionMin);
-        datos.anadirArticulo(articulo); // No lanza excepciones
+        datos.anadirArticulo(articulo);
     }
 
     /**
@@ -128,12 +128,10 @@ public class Controlador {
             throw new RecursoNoEncontradoException("Artículo", codigoArticulo);
         }
 
-        // Crear pedido
+        // Pide a datos un número de pedido nuevo y crea el pedido con los datos
         int numeroPedido = datos.generarNumeroPedido();
         Pedido pedido = new Pedido(numeroPedido, cliente, articulo, cantidad, LocalDateTime.now());
-
-        // Guardar pedido
-        datos.anadirPedido(pedido); // No lanza excepciones
+        datos.anadirPedido(pedido);
 
         return pedido;
     }
@@ -154,41 +152,54 @@ public class Controlador {
         if (!pedido.puedeCancelar()) { // Lanzamos excepción si ya está enviado
             throw new PedidoNoCancelableException(numeroPedido);
         }
-        datos.eliminarPedido(pedido); // No lanza excepciones
+        datos.eliminarPedido(pedido);
     }
 
     /**
-     * Obtiene los pedidos pendientes (no enviados).
+     * Obtiene pedidos pendientes. Si se proporciona email, filtra por cliente.
      *
-     * @param emailCliente Email para filtrar por cliente (si es null o vacío, devuelve todos)
-     * @return Lista de pedidos pendientes
+     * @param emailCliente Email para filtrar (null = todos los pedidos)
+     * @return Lista de pedidos pendientes (puede estar vacía)
+     * @throws RecursoNoEncontradoException Si el email no es null y el cliente no existe
      */
-    public List<Pedido> obtenerPedidosPendientes(String emailCliente) {
-        List<Pedido> pedidos = datos.getPedidosPendientes();
-
-        if (emailCliente != null && !emailCliente.isEmpty()) {
-            pedidos = pedidos.stream()
-                    .filter(p -> p.getCliente().getEmail().equalsIgnoreCase(emailCliente))
-                    .collect(Collectors.toList());
+    public List<Pedido> obtenerPedidosPendientes(String emailCliente)
+            throws EmailInvalidoException, RecursoNoEncontradoException {
+        // 1. Si se introduce vacío devuelve todos directamente
+        if (emailCliente == null || emailCliente.isEmpty()) {
+            return datos.getPedidosPendientes();
         }
-        return pedidos;
+        emailValido(emailCliente); // Validar email, puede lanzar su excepción
+
+        if (!datos.existeCliente(emailCliente)) { // Lanzamos excepción si el email no se encuentra
+            throw new RecursoNoEncontradoException("Cliente", emailCliente);
+        }
+        // 2. Si existe envía los datos
+        return datos.getPedidosPendientes().stream()
+                .filter(p -> p.getCliente().getEmail().equalsIgnoreCase(emailCliente))
+                .collect(Collectors.toList());
     }
 
     /**
-     * Obtiene los pedidos ya enviados.
+     * Obtiene pedidos enviados. Si se proporciona email, filtra por cliente.
      *
-     * @param emailCliente Email para filtrar por cliente (si es null o vacío, devuelve todos)
-     * @return Lista de pedidos enviados
+     * @param emailCliente Email para filtrar (null o vacío = todos los pedidos)
+     * @return Lista de pedidos enviados (puede estar vacía)
+     * @throws RecursoNoEncontradoException Si el email no es null/vacío y el cliente no existe
      */
-    public List<Pedido> obtenerPedidosEnviados(String emailCliente) {
-        List<Pedido> pedidos = datos.getPedidosEnviados();
-
-        if (emailCliente != null && !emailCliente.isEmpty()) {
-            pedidos = pedidos.stream()
-                    .filter(p -> p.getCliente().getEmail().equalsIgnoreCase(emailCliente))
-                    .collect(Collectors.toList());
+    public List<Pedido> obtenerPedidosEnviados(String emailCliente)
+            throws EmailInvalidoException, RecursoNoEncontradoException {
+        // 1. Si se introduce vacío devuelve todos directamente
+        if (emailCliente == null || emailCliente.isEmpty()) {
+            return datos.getPedidosEnviados();
         }
-        return pedidos;
+        emailValido(emailCliente); // Validar email, puede lanzar su excepción
+        if (!datos.existeCliente(emailCliente)) { // Lanzamos excepción si el email no se encuentra
+            throw new RecursoNoEncontradoException("Cliente", emailCliente);
+        }
+        // 2. Si existe filtra los pedidos enviados del cliente
+        return datos.getPedidosEnviados().stream()
+                .filter(p -> p.getCliente().getEmail().equalsIgnoreCase(emailCliente))
+                .collect(Collectors.toList());
     }
     /* =========================================================
        =================== GESTIÓN DE CLIENTES ==================

@@ -439,16 +439,18 @@ public class Vista {
      */
     private void mostrarPedidosPendientes() {
         TerminalUI.sectionTitle("PEDIDOS PENDIENTES");
-
         String emailFiltro = leerTexto("Filtrar por email del cliente (dejar vacío para todos): ");
-        if (emailFiltro.isEmpty()) emailFiltro = null;
 
-        List<Pedido> pedidos = controlador.obtenerPedidosPendientes(emailFiltro);
+        try {
+            List<Pedido> pedidos = controlador.obtenerPedidosPendientes(emailFiltro);
 
-        if (pedidos.isEmpty()) {
-            TerminalUI.empty("No hay pedidos pendientes que mostrar.");
-        } else {
-            TerminalUI.showOrdersTable(pedidos);
+            if (pedidos.isEmpty()) { // Si la lista está vacía se informa que no hay pedidos
+                TerminalUI.empty("No hay pedidos pendientes que mostrar.");
+            } else {
+                TerminalUI.showOrdersTable(pedidos);
+            }
+        } catch (EmailInvalidoException | RecursoNoEncontradoException e) {
+            TerminalUI.exception(e.getMessage());
         }
     }
 
@@ -457,16 +459,18 @@ public class Vista {
      */
     private void mostrarPedidosEnviados() {
         TerminalUI.sectionTitle("PEDIDOS ENVIADOS");
-
         String emailFiltro = leerTexto("Filtrar por email del cliente (dejar vacío para todos): ");
-        if (emailFiltro.isEmpty()) emailFiltro = null;
+        try {
+            List<Pedido> pedidos = controlador.obtenerPedidosEnviados(emailFiltro);
 
-        List<Pedido> pedidos = controlador.obtenerPedidosEnviados(emailFiltro);
+            if (pedidos.isEmpty()) { // Si la lista está vacía se informa que no hay pedidos
+                TerminalUI.empty("No hay pedidos enviados que mostrar.");
+            } else {
+                TerminalUI.showOrdersTable(pedidos);
+            }
 
-        if (pedidos.isEmpty()) {
-            TerminalUI.empty("No hay pedidos enviados que mostrar.");
-        } else {
-            TerminalUI.showOrdersTable(pedidos);
+        } catch (EmailInvalidoException | RecursoNoEncontradoException e) { // Se lanza si no existe el cliente
+            TerminalUI.exception(e.getMessage());
         }
     }
 
